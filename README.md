@@ -1,6 +1,8 @@
 # Gonnel
+[![Go Report Card](https://goreportcard.com/badge/github.com/afdalwahyu/gonnel)](https://goreportcard.com/report/github.com/afdalwahyu/gonnel)
+[![GoDoc](https://godoc.org/github.com/afdalwahyu/gonnel?status.svg)](https://github.com/afdalwahyu/gonnel/)
 
-    > Golang wrapper for ngrok. Expose your localhost to the internet.
+    >Golang wrapper for ngrok. Expose your localhost to the internet.
 Tested on linux, hopefully supports Mac, Windows, and Linux
 
 
@@ -17,7 +19,7 @@ go get -u github.com/afdalwahyu/gonnel
 ```
 
 ## [Examples:](https://github.com/afdalwahyu/gonnel/tree/master/examples)
-### Create client &
+### Create client & tunnel
 ```Go
 package main
 
