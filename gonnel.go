@@ -45,17 +45,18 @@
 package gonnel
 
 import (
-	"os/exec"
-	"sync"
+	"bytes"
 	"errors"
 	"log"
 	"os"
-	"regexp"
-	"syscall"
+	"os/exec"
 	"os/signal"
-	"bytes"
+	"regexp"
+	"sync"
+	"syscall"
 )
 
+// Protocol type
 type Protocol int
 
 // Protocol that ngrok support
@@ -131,7 +132,7 @@ func NewClient(opt Options) (*Client, error) {
 }
 
 // AuthTokenCommand that will be authenticate api token
-func (o *Options) AuthTokenCommand() (error) {
+func (o *Options) AuthTokenCommand() error {
 	if o.AuthToken == "" {
 		return errors.New("token missing")
 	}
@@ -245,7 +246,7 @@ func (c *Client) StartServer(isReady chan bool) {
 
 // generateCommands return array of commands
 // that will be run on binary
-func (o *Options) generateCommands() ([]string) {
+func (o *Options) generateCommands() []string {
 	commands := make([]string, 0)
 	commands = append(commands, []string{"start", "--none", "--log=stdout"}...)
 	commands = append(commands, "--region="+o.Region)
@@ -329,11 +330,11 @@ func (c *Client) DisconnectAll() error {
 }
 
 // Close running command and send kill signal to ngrok binary
-func (c *Client) Close() (error) {
+func (c *Client) Close() error {
 	return c.runningCmd.Process.Kill()
 }
 
 // Signal handle signal input and proceed to command
-func (c *Client) Signal(signal os.Signal) (error) {
+func (c *Client) Signal(signal os.Signal) error {
 	return c.runningCmd.Process.Signal(signal)
 }

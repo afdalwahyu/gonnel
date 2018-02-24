@@ -1,13 +1,13 @@
 package gonnel
 
 import (
-	"encoding/json"
-	"net/http"
 	"bytes"
-	"fmt"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"time"
 )
 

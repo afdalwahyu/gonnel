@@ -17,7 +17,7 @@ type responseCreateTunnel struct {
 	URI       string `json:"uri"`
 	PublicURL string `json:"public_url"`
 	Proto     string `json:"Proto"`
-	Config struct {
+	Config    struct {
 		Addr    string `json:"addr"`
 		Inspect bool   `json:"Inspect"`
 	} `json:"config"`

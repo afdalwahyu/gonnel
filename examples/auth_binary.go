@@ -1,8 +1,8 @@
 package main
 
 import (
-	"gonnel"
 	"fmt"
+	"gonnel"
 )
 
 func main() {
