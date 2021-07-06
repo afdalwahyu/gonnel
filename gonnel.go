@@ -197,12 +197,14 @@ func (c *Client) StartServer(isReady chan bool) {
 		log.Fatal(err)
 	}
 
-	signalChan := make(chan os.Signal, 1)
-	signal.Notify(
-		signalChan, syscall.SIGHUP,
-		syscall.SIGINT, syscall.SIGTERM,
-		syscall.SIGQUIT)
-	go c.handleSignalInput(signalChan)
+	if !c.Options.IgnoreSignals {
+		signalChan := make(chan os.Signal, 1)
+		signal.Notify(
+			signalChan, syscall.SIGHUP,
+			syscall.SIGINT, syscall.SIGTERM,
+			syscall.SIGQUIT)
+		go c.handleSignalInput(signalChan)
+	}
 
 	checkNGReady, err := regexp.Compile(ngReady)
 	if err != nil {
