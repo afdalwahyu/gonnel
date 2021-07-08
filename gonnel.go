@@ -79,12 +79,13 @@ func (p Protocol) String() string { return protocols[p] }
 // Not all of this option necessary, if AuthToken provided then
 // binary will run auth token first.
 type Options struct {
-	SubDomain  string // Sub domain config if you're using premium plan
-	AuthToken  string // Auth token to authenticate client
-	Region     string // Region that will tunneling from
-	ConfigPath string // Path config to store auth token or specific WebUI port
-	BinaryPath string // Binary file that will be running
-	LogBinary  bool   // You can watch binary log or not
+	SubDomain     string // Sub domain config if you're using premium plan
+	AuthToken     string // Auth token to authenticate client
+	Region        string // Region that will tunneling from
+	ConfigPath    string // Path config to store auth token or specific WebUI port
+	BinaryPath    string // Binary file that will be running
+	LogBinary     bool   // You can watch binary log or not
+	IgnoreSignals bool   // Run child processes in a separate process group to ignore signals
 }
 
 // Client that provides all option and tunnel
@@ -149,6 +150,12 @@ func (o *Options) AuthTokenCommand() error {
 	}
 
 	cmd := exec.Command(o.BinaryPath, commands...)
+	if o.IgnoreSignals {
+		cmd.SysProcAttr = &syscall.SysProcAttr{
+			Setpgid: true,
+			Pgid:    0,
+		}
+	}
 	var outBuffer, errBuffer bytes.Buffer
 	cmd.Stdout = &outBuffer
 	cmd.Stderr = &errBuffer
@@ -174,6 +181,12 @@ func (c *Client) StartServer(isReady chan bool) {
 
 	commands := c.Options.generateCommands()
 	cmd := exec.Command(c.Options.BinaryPath, commands...)
+	if c.Options.IgnoreSignals {
+		cmd.SysProcAttr = &syscall.SysProcAttr{
+			Setpgid: true,
+			Pgid:    0,
+		}
+	}
 	c.runningCmd = cmd
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
@@ -184,12 +197,14 @@ func (c *Client) StartServer(isReady chan bool) {
 		log.Fatal(err)
 	}
 
-	signalChan := make(chan os.Signal, 1)
-	signal.Notify(
-		signalChan, syscall.SIGHUP,
-		syscall.SIGINT, syscall.SIGTERM,
-		syscall.SIGQUIT)
-	go c.handleSignalInput(signalChan)
+	if !c.Options.IgnoreSignals {
+		signalChan := make(chan os.Signal, 1)
+		signal.Notify(
+			signalChan, syscall.SIGHUP,
+			syscall.SIGINT, syscall.SIGTERM,
+			syscall.SIGQUIT)
+		go c.handleSignalInput(signalChan)
+	}
 
 	checkNGReady, err := regexp.Compile(ngReady)
 	if err != nil {
